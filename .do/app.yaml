@@ -3,7 +3,7 @@ services:
 - name: frontend
   source_dir: /
   github:
-    repo: your-username/bpo_call_version5
+    repo: Banuweb3/TRACKERBINLP
     branch: main
   run_command: npm start
   environment_slug: node-js
@@ -23,7 +23,7 @@ services:
 - name: api
   source_dir: /server
   github:
-    repo: your-username/bpo_call_version5
+    repo: Banuweb3/TRACKERBINLP
     branch: main
   run_command: npm start
   environment_slug: node-js
