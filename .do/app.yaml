@@ -1,0 +1,126 @@
+name: bpo-analytics-platform
+services:
+- name: frontend
+  source_dir: /
+  github:
+    repo: your-username/bpo_call_version5
+    branch: main
+  run_command: npm start
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  build_command: npm run build
+  http_port: 8080
+  envs:
+  - key: NODE_ENV
+    value: production
+  - key: FRONTEND_URL
+    value: ${APP_URL}
+  routes:
+  - path: /
+    preserve_path_prefix: false
+
+- name: api
+  source_dir: /server
+  github:
+    repo: your-username/bpo_call_version5
+    branch: main
+  run_command: npm start
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 3001
+  envs:
+  - key: NODE_ENV
+    value: production
+  - key: PORT
+    value: "3001"
+  - key: FRONTEND_URL
+    value: ${frontend.PUBLIC_URL}
+  - key: DB_HOST
+    value: ${db.HOSTNAME}
+  - key: DB_PORT
+    value: ${db.PORT}
+  - key: DB_USER
+    value: ${db.USERNAME}
+  - key: DB_PASSWORD
+    value: ${db.PASSWORD}
+  - key: DB_NAME
+    value: ${db.DATABASE}
+  - key: JWT_SECRET
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_2
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_3
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_4
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_5
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_6
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_7
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_8
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_9
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_10
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_11
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_12
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_13
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_14
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_15
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_16
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_17
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_18
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_19
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: API_KEY_20
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  routes:
+  - path: /api
+    preserve_path_prefix: true
+
+databases:
+- name: db
+  engine: MYSQL
+  version: "8"
+  size: db-s-1vcpu-1gb
+  num_nodes: 1
+
+alerts:
+- rule: DEPLOYMENT_FAILED
+- rule: DOMAIN_FAILED

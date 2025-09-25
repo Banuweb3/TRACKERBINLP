@@ -1,0 +1,33 @@
+{
+  "name": "bpo-quality-analytics-platform",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "npm run build && npm run serve",
+    "serve": "npx serve -s dist -l 8080"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@google/genai": "^1.17.0",
+    "@mui/icons-material": "^7.3.2",
+    "@mui/material": "^7.3.2",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "serve": "^14.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.1",
+    "@vitejs/plugin-react": "^5.0.2",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}
