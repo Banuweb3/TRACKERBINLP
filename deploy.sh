@@ -18,6 +18,36 @@ fi
 # Check if package.json has correct scripts
 echo "📦 Checking package.json scripts..."
 
+# Check for Rollup platform dependencies
+if grep -q '@rollup/rollup-linux-x64-gnu' package.json; then
+    echo "✅ Rollup Linux x64 GNU dependency found"
+else
+    echo "⚠️  Adding Rollup Linux x64 GNU dependency"
+    npm install @rollup/rollup-linux-x64-gnu --save
+fi
+
+if grep -q '@rollup/rollup-linux-x64-musl' package.json; then
+    echo "✅ Rollup Linux x64 MUSL dependency found"
+else
+    echo "⚠️  Adding Rollup Linux x64 MUSL dependency"
+    npm install @rollup/rollup-linux-x64-musl --save
+fi
+
+# Check .npmrc file
+if [ -f ".npmrc" ]; then
+    if grep -q 'optional=false' .npmrc; then
+        echo "✅ .npmrc configured correctly"
+    else
+        echo "⚠️  Updating .npmrc for deployment"
+        echo "optional=false" >> .npmrc
+    fi
+else
+    echo "⚠️  Creating .npmrc for deployment"
+    echo "optional=false" > .npmrc
+    echo "fund=false" >> .npmrc
+    echo "audit=false" >> .npmrc
+fi
+
 # Frontend package.json check
 if grep -q '"start":' package.json; then
     echo "✅ Frontend start script found"

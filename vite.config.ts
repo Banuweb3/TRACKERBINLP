@@ -29,6 +29,14 @@ export default defineConfig(({ mode }) => {
               vendor: ['react', 'react-dom'],
               mui: ['@mui/material', '@mui/icons-material']
             }
+          },
+          // Explicitly handle platform-specific dependencies
+          external: (id) => {
+            // Don't externalize rollup platform-specific modules
+            if (id.includes('@rollup/rollup-')) {
+              return false;
+            }
+            return false;
           }
         }
       },
