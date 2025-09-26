@@ -20,6 +20,7 @@
     "@google/genai": "^1.17.0",
     "@mui/icons-material": "^7.3.2",
     "@mui/material": "^7.3.2",
+    "@rollup/rollup-linux-x64-gnu": "^4.28.1",
     "@vitejs/plugin-react": "^5.0.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
