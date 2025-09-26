@@ -5,11 +5,11 @@ services:
   github:
     repo: Banuweb3/TRACKERBINLP
     branch: main
-  run_command: npm start
+  run_command: npx serve -s dist -l 8080
   environment_slug: node-js
   instance_count: 1
   instance_size_slug: basic-xxs
-  build_command: npm run build
+  build_command: npm install && npm run build
   http_port: 8080
   envs:
   - key: NODE_ENV
@@ -29,6 +29,7 @@ services:
   environment_slug: node-js
   instance_count: 1
   instance_size_slug: basic-xxs
+  build_command: npm install
   http_port: 3001
   envs:
   - key: NODE_ENV
@@ -47,6 +48,8 @@ services:
     value: ${db.PASSWORD}
   - key: DB_NAME
     value: ${db.DATABASE}
+  - key: CORS_ORIGIN
+    value: ${frontend.PUBLIC_URL}
   - key: JWT_SECRET
     scope: RUN_AND_BUILD_TIME
     type: SECRET
@@ -114,12 +117,21 @@ services:
   - path: /api
     preserve_path_prefix: true
 
+# Option 1: Use managed database (recommended)
 databases:
 - name: db
   engine: MYSQL
   version: "8"
   size: db-s-1vcpu-1gb
   num_nodes: 1
+
+# Option 2: Use external database (if you want to manage it yourself)
+# Remove the databases section above and set these environment variables:
+# DB_HOST=your-external-mysql-host
+# DB_PORT=3306
+# DB_USER=your-mysql-user
+# DB_PASSWORD=your-mysql-password
+# DB_NAME=bpo_analytics
 
 alerts:
 - rule: DEPLOYMENT_FAILED
