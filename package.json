@@ -27,6 +27,7 @@
   "devDependencies": {
     "@types/node": "^22.18.1",
     "@vitejs/plugin-react": "^5.0.2",
+    "terser": "^5.44.0",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
   }
