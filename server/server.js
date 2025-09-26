@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { testConnection, cleanupExpiredTokens } from './config/database.js';
+import setupDatabase from './scripts/setupDatabase.js';
 import authRoutes from './routes/auth.js';
 import analysisRoutes from './routes/analysis.js';
 import bulkAnalysisRoutes from './routes/bulkAnalysis.js';
@@ -94,6 +95,10 @@ process.on('SIGINT', () => {
 // Start server
 const startServer = async () => {
   try {
+    // Setup database schema first
+    console.log('🗄️  Setting up database...');
+    await setupDatabase();
+    
     // Test database connection
     const dbConnected = await testConnection();
     if (!dbConnected) {
