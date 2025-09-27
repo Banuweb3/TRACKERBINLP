@@ -1,8 +1,19 @@
 import type { Language, ComprehensiveAnalysisResult, KeywordsResult } from '../types';
 import { authService } from './authService';
 
-// API base URL - adjust this to match your backend server
-const API_BASE_URL = 'http://localhost:3001/api/analysis';
+// Automatically detect API base URL
+const getApiBaseUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      return '/api/analysis';
+    }
+  }
+  return ((import.meta as any).env?.VITE_API_BASE_URL || '/api') + '/analysis';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+console.log('🔗 Gemini API Base URL:', API_BASE_URL);
 
 /**
  * Make authenticated API request

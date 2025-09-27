@@ -1,4 +1,22 @@
-const API_BASE_URL = 'http://localhost:3001/api';
+// Automatically detect API base URL
+const getApiBaseUrl = (): string => {
+  // Check if we're in production (not localhost)
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    
+    // If accessing via IP or domain (not localhost), use relative URLs for proxy
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      return '/api';
+    }
+  }
+  
+  // For development, check environment variables
+  return (import.meta as any).env?.VITE_API_BASE_URL || '/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
+console.log('🔗 Auth API Base URL:', API_BASE_URL);
 
 export interface User {
   id: number;

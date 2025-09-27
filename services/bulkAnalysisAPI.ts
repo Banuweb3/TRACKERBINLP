@@ -1,6 +1,18 @@
 import { authService } from './authService';
 
-const API_BASE_URL = 'http://localhost:3001/api';
+// Automatically detect API base URL
+const getApiBaseUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      return '/api';
+    }
+  }
+  return (import.meta as any).env?.VITE_API_BASE_URL || '/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+console.log('🔗 Bulk Analysis API Base URL:', API_BASE_URL);
 
 export interface BulkAnalysisSession {
   id: number;
