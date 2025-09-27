@@ -74,8 +74,10 @@ git clone https://github.com/Banuweb3/TRACKERBINLP.git .
 # Setup MySQL database
 print_status "Setting up MySQL database..."
 sudo mysql -e "CREATE DATABASE IF NOT EXISTS bpo_analytics;"
-sudo mysql -e "CREATE USER IF NOT EXISTS 'bpo_user'@'localhost' IDENTIFIED BY 'BpoAnalytics2024!';"
+sudo mysql -e "DROP USER IF EXISTS 'bpo_user'@'localhost';"
+sudo mysql -e "CREATE USER 'bpo_user'@'localhost' IDENTIFIED BY 'Banu@1234';"
 sudo mysql -e "GRANT ALL PRIVILEGES ON bpo_analytics.* TO 'bpo_user'@'localhost';"
+sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Banu@1234';"
 sudo mysql -e "FLUSH PRIVILEGES;"
 
 print_status "MySQL database 'bpo_analytics' created with user 'bpo_user'"
@@ -124,16 +126,20 @@ PORT=3001
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=bpo_user
-DB_PASSWORD=BpoAnalytics2024!
+DB_PASSWORD=Banu@1234
 DB_NAME=bpo_analytics
 JWT_SECRET=your_super_secure_jwt_secret_key_here_make_it_long_and_random_for_production_$(date +%s)
-FRONTEND_URL=http://your-domain.com
-CORS_ORIGIN=http://your-domain.com
+FRONTEND_URL=http://$(curl -s ifconfig.me)
+CORS_ORIGIN=http://$(curl -s ifconfig.me)
 
-# Your Gemini API keys
-API_KEY=AIzaSyA87I2mshoMLktcbPdFvI1v2VAvo2SdK2E
-API_KEY_2=AIzaSyDXUV16D4HGO23LuLxgl6jnYlHyxsYpJIY
-API_KEY_3=AIzaSyBdWERbTOAFv6AGFlm7IGDNowkR8gafewA
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# Your Gemini API keys (correct ones from your local setup)
+API_KEY=AIzaSyDXUV16D4HGO23LuLxgl6jnYlHyxsYpJIY
+API_KEY_2=AIzaSyDARNXwY5iSYT1VL96Ihmuhmc1WzSIRsOI
+API_KEY_3=AIzaSyBPCrAqcOqvYwkRbOBBM8NSg6F7zVknctQ
 API_KEY_4=AIzaSyCUedUoOlq40hxDUwfWpBE2oCOOzezGkpc
 API_KEY_5=AIzaSyBrnFs-PM_Z-qN-simcLFrGODm0o1ixdvc
 API_KEY_6=AIzaSyBPCrAqcOqvYwkRbOBBM8NSg6F7zVknctQ
@@ -142,16 +148,41 @@ API_KEY_8=AIzaSyAPBoSN5v_3AMbDO6j2NdigroEAmHbRXGc
 API_KEY_9=AIzaSyCHU0rqhEhxPlFVD0z-LiDOhZ8HRgkiwv4
 API_KEY_10=AIzaSyDARNXwY5iSYT1VL96Ihmuhmc1WzSIRsOI
 API_KEY_11=AIzaSyD0NMjjLZLtgN-6sEQYuqvVnggRsfE_d8U
+API_KEY_12=AIzaSyAPBoSN5v_3AMbDO6j2NdigroEAmHbRXGc
+API_KEY_13=AIzaSyARSlSfk5DPr9zliOsSylmKF9qsdCSbiDk
 EOF
 
 # Initialize database schema
 print_status "Initializing database schema..."
+
+# Execute all SQL files in order
+print_status "Executing SQL schema files..."
+if [ -f "sql/bpo_analytics.sql" ]; then
+    print_status "Executing main schema: bpo_analytics.sql"
+    mysql -u bpo_user -p'Banu@1234' bpo_analytics < sql/bpo_analytics.sql
+fi
+
+if [ -f "sql/bulk_analysis_tables.sql" ]; then
+    print_status "Executing bulk analysis schema: bulk_analysis_tables.sql"
+    mysql -u bpo_user -p'Banu@1234' bpo_analytics < sql/bulk_analysis_tables.sql
+fi
+
+# Execute other SQL files if they exist
+for sql_file in sql/*.sql; do
+    if [ -f "$sql_file" ] && [ "$sql_file" != "sql/bpo_analytics.sql" ] && [ "$sql_file" != "sql/bulk_analysis_tables.sql" ]; then
+        print_status "Executing: $(basename $sql_file)"
+        mysql -u bpo_user -p'Banu@1234' bpo_analytics < "$sql_file" || print_warning "Failed to execute $sql_file"
+    fi
+done
+
+# Run Node.js database setup if available
 if [ -f "scripts/setupDatabase.js" ]; then
+    print_status "Running Node.js database setup..."
     node scripts/setupDatabase.js
 else
-    print_warning "Database setup script not found, creating basic structure..."
-    # Create a basic database initialization
-    mysql -u bpo_user -pBpoAnalytics2024! bpo_analytics << 'SQL'
+    print_warning "Node.js database setup script not found, using basic initialization..."
+    # Create basic tables if SQL files didn't work
+    mysql -u bpo_user -p'Banu@1234' bpo_analytics << 'SQL'
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(50) UNIQUE NOT NULL,
@@ -164,8 +195,17 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   is_active BOOLEAN DEFAULT TRUE
 );
+
+-- Create default admin user
+INSERT IGNORE INTO users (username, email, password_hash, first_name, last_name, role) 
+VALUES ('admin', 'admin@bpo-analytics.com', '$2b$10$rQZ8kqVZ8qVZ8qVZ8qVZ8u', 'Admin', 'User', 'admin');
 SQL
 fi
+
+# Verify database setup
+print_status "Verifying database setup..."
+table_count=$(mysql -u bpo_user -p'Banu@1234' bpo_analytics -e "SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = 'bpo_analytics';" -s -N)
+print_status "Database setup complete! Created $table_count tables"
 
 # Setup Nginx configuration
 print_status "Setting up Nginx configuration..."

@@ -38,8 +38,18 @@ const setupDatabase = async () => {
     await connection.execute(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
     console.log(`✅ Database ${dbName} created or already exists`);
 
-    // Use the database
-    await connection.execute(`USE \`${dbName}\``);
+    // Close current connection and reconnect to the specific database
+    await connection.end();
+    
+    // Reconnect with the database specified
+    connection = await mysql.createConnection({
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 3306,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: dbName,
+      multipleStatements: true
+    });
 
     // Read and execute the main SQL schema file
     const sqlFilePath = path.join(__dirname, '..', 'sql', 'bpo_analytics.sql');
