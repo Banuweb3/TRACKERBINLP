@@ -94,6 +94,8 @@ class AuthService {
   // Login user
   async login(data: LoginData): Promise<AuthResponse> {
     try {
+      console.log('🔐 Attempting login to:', `${API_BASE_URL}/auth/login`);
+      
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
@@ -102,16 +104,49 @@ class AuthService {
         body: JSON.stringify(data),
       });
 
+      console.log('📡 Login response status:', response.status);
+      console.log('📡 Login response headers:', Object.fromEntries(response.headers.entries()));
+
+      // Check if response has content
+      const responseText = await response.text();
+      console.log('📡 Raw response:', responseText);
+
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Login failed');
+        let errorMessage = 'Login failed';
+        try {
+          if (responseText) {
+            const error = JSON.parse(responseText);
+            errorMessage = error.error || error.message || 'Login failed';
+          }
+        } catch (parseError) {
+          console.error('Error parsing error response:', parseError);
+          errorMessage = `Server error (${response.status}): ${responseText || 'No response body'}`;
+        }
+        throw new Error(errorMessage);
       }
 
-      const result: AuthResponse = await response.json();
+      // Parse successful response
+      if (!responseText) {
+        throw new Error('Empty response from server');
+      }
+
+      let result: AuthResponse;
+      try {
+        result = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Error parsing success response:', parseError);
+        throw new Error(`Invalid JSON response: ${responseText}`);
+      }
+
+      if (!result.token || !result.user) {
+        throw new Error('Invalid response format: missing token or user data');
+      }
+
       this.setAuth(result.token, result.user);
+      console.log('✅ Login successful for user:', result.user.email);
       return result;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('❌ Login error:', error);
       throw error;
     }
   }

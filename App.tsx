@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import type { Language, AnalysisData } from './types';
+import type { Language, AnalysisData, ComprehensiveAnalysisResult } from './types';
 import { performCompleteAnalysis } from './services/geminiService';
 import { authService, type User } from './services/authService';
 import { analysisService } from './services/analysisService';
@@ -13,6 +13,7 @@ import AudioUpload from './components/AudioUpload';
 import AuthModal from './components/AuthModal';
 import UserMenu from './components/UserMenu';
 import DatabaseDashboard from './components/DatabaseDashboard';
+import MetaDashboard from './components/MetaDashboard';
 import { Header, Footer } from './components/Layout';
 
 const App: React.FC = () => {
@@ -32,7 +33,7 @@ const App: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
   
   // Navigation state
-  const [viewMode, setViewMode] = useState<'single' | 'audio' | 'bulk'>('single');
+  const [viewMode, setViewMode] = useState<'single' | 'audio' | 'bulk' | 'meta'>('single');
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [bulkResults, setBulkResults] = useState<EnhancedAnalysisResult[]>([]);
   const [bulkProgress, setBulkProgress] = useState<BulkAnalysisProgress[]>([]);
@@ -72,11 +73,21 @@ const App: React.FC = () => {
           setCurrentSessionId(existingSession.id);
           
           // Load existing analysis data
-          const analysisData = {
-            transcription: existingSession.analysisResults.transcription,
-            translation: existingSession.analysisResults.translation,
-            analysis: existingSession.analysisResults.analysis,
-            keywords: existingSession.analysisResults.keywords,
+          const analysisData: AnalysisData = {
+            transcription: existingSession.analysisResults.transcription || '',
+            translation: existingSession.analysisResults.translation || '',
+            analysis: (existingSession.analysisResults.analysis as ComprehensiveAnalysisResult) || {
+              customerSentiment: { sentiment: 'NEUTRAL' as const, score: 0, justification: '' },
+              agentSentiment: {
+                positive: { sentiment: 'NEUTRAL' as const, score: 0, justification: '' },
+                callOpening: { sentiment: 'NEUTRAL' as const, score: 0, justification: '' },
+                callQuality: { sentiment: 'NEUTRAL' as const, score: 0, justification: '' },
+                callClosing: { sentiment: 'NEUTRAL' as const, score: 0, justification: '' }
+              },
+              summary: '',
+              agentCoaching: ''
+            },
+            keywords: existingSession.analysisResults.keywords || [],
           };
           
           setAnalysisData(analysisData);
@@ -124,7 +135,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedLanguage, user]);
+  }, [selectedLanguage, viewMode]);
 
   const handleBulkAnalysis = useCallback(async (files: File[]) => {
     if (!user) {
@@ -197,6 +208,7 @@ const App: React.FC = () => {
     setBulkProgress([]);
     setSuccessMessage(null);
     setViewMode('single');
+    setShowHistory(false);
   };
 
   const handleSelectSession = async (session: any) => {
@@ -205,12 +217,23 @@ const App: React.FC = () => {
       const fullSession = await analysisService.getSession(session.id);
       
       if (fullSession.analysisResults) {
-        setAnalysisData({
-          transcription: fullSession.analysisResults.transcription,
-          translation: fullSession.analysisResults.translation,
-          analysis: fullSession.analysisResults.analysis,
-          keywords: fullSession.analysisResults.keywords
-        });
+        const analysisData: AnalysisData = {
+          transcription: fullSession.analysisResults.transcription || '',
+          translation: fullSession.analysisResults.translation || '',
+          analysis: (fullSession.analysisResults.analysis as ComprehensiveAnalysisResult) || {
+            customerSentiment: { sentiment: 'NEUTRAL' as const, score: 0, justification: '' },
+            agentSentiment: {
+              positive: { sentiment: 'NEUTRAL' as const, score: 0, justification: '' },
+              callOpening: { sentiment: 'NEUTRAL' as const, score: 0, justification: '' },
+              callQuality: { sentiment: 'NEUTRAL' as const, score: 0, justification: '' },
+              callClosing: { sentiment: 'NEUTRAL' as const, score: 0, justification: '' }
+            },
+            summary: '',
+            agentCoaching: ''
+          },
+          keywords: fullSession.analysisResults.keywords || []
+        };
+        setAnalysisData(analysisData);
         setCurrentSessionId(fullSession.id);
         setAnalysisStarted(true);
       }
@@ -283,6 +306,19 @@ const App: React.FC = () => {
                 >
                   Bulk Analysis
                 </button>
+                <button
+                  onClick={() => {
+                    setViewMode('meta');
+                    setShowHistory(false);
+                  }}
+                  className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    viewMode === 'meta' && !showHistory
+                      ? 'bg-primary text-text-light' 
+                      : 'text-text-light/80 hover:text-text-light'
+                  }`}
+                >
+                  Meta Dashboard
+                </button>
               </div>
               <button
                 onClick={() => setShowHistory(!showHistory)}
@@ -351,6 +387,10 @@ const App: React.FC = () => {
                 />
               </div>
             </>
+          ) : viewMode === 'meta' ? (
+            <div className="lg:col-span-12">
+              <MetaDashboard />
+            </div>
           ) : (
             <>
               <div className="lg:col-span-4">

@@ -53,4 +53,5 @@ export const cleanupExpiredTokens = async () => {
   }
 };
 
+export { pool };
 export default pool;

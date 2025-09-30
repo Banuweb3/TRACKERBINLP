@@ -8,6 +8,7 @@ import setupDatabase from './scripts/setupDatabase.js';
 import authRoutes from './routes/auth.js';
 import analysisRoutes from './routes/analysis.js';
 import bulkAnalysisRoutes from './routes/bulkAnalysis.js';
+import metaRoutes from './routes/meta.js';
 
 // Load environment variables
 dotenv.config();
@@ -56,6 +57,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/analysis', analysisRoutes);
 app.use('/api/bulk-analysis', bulkAnalysisRoutes);
+app.use('/api/meta', metaRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

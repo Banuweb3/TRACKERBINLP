@@ -31,11 +31,29 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
     setError(null);
 
     try {
+      console.log('🔐 Starting login process...');
       await authService.login(loginData);
+      console.log('✅ Login successful, calling onSuccess...');
       onSuccess();
       onClose();
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Login failed');
+      console.error('❌ Login failed in AuthModal:', error);
+      
+      let errorMessage = 'Login failed';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        
+        // Handle specific JSON parse errors
+        if (error.message.includes('JSON.parse: unexpected end of data')) {
+          errorMessage = 'Server connection error. Please check if the backend server is running.';
+        } else if (error.message.includes('Failed to fetch')) {
+          errorMessage = 'Cannot connect to server. Please check your internet connection and try again.';
+        } else if (error.message.includes('NetworkError')) {
+          errorMessage = 'Network error. Please check if the server is accessible.';
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
