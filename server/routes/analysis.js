@@ -628,9 +628,57 @@ router.post('/complete', authenticateToken, upload.single('audio'), async (req, 
 
   } catch (error) {
     console.error('Complete analysis error:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Error details:', {
+      message: error.message,
+      status: error.status,
+      statusText: error.statusText,
+      name: error.name
+    });
+    
     res.status(500).json({ 
       error: 'Failed to perform complete analysis',
-      details: error.message 
+      details: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Test Gemini API keys endpoint (for debugging)
+router.get('/test-gemini', authenticateToken, async (req, res) => {
+  try {
+    const { GoogleGenerativeAI } = await import('@google/generative-ai');
+    const apiKey = process.env.API_KEY;
+    
+    if (!apiKey) {
+      return res.status(500).json({ 
+        error: 'No API key found',
+        details: 'API_KEY environment variable is not set'
+      });
+    }
+
+    console.log('Testing Gemini API with key:', apiKey.substring(0, 20) + '...');
+    
+    const ai = new GoogleGenerativeAI(apiKey);
+    const model = ai.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    
+    const response = await model.generateContent("Hello, respond with 'API key is working!'");
+    const text = response.response.text();
+    
+    res.json({
+      success: true,
+      message: 'Gemini API is working',
+      response: text,
+      keyPrefix: apiKey.substring(0, 20) + '...'
+    });
+    
+  } catch (error) {
+    console.error('Gemini API test failed:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Gemini API test failed',
+      details: error.message,
+      errorType: error.constructor.name
     });
   }
 });

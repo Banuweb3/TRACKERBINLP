@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { analysisService, type AnalysisSession } from '../services/analysisService';
+import { analysisService } from '../services/analysisService';
+import { safeGet, safeArray, validateSession } from '../utils/safeAccess';
 
 interface DatabaseDashboardProps {
   onSelectSession?: (session: AnalysisSession) => void;
@@ -28,22 +29,26 @@ const DatabaseDashboard: React.FC<DatabaseDashboardProps> = ({ onSelectSession }
   });
 
   useEffect(() => {
-    loadDashboardData();
   }, [selectedDateRange]);
 
   const loadDashboardData = async () => {
     try {
       setIsLoading(true);
-      const sessionData = await analysisService.getSessions(100, 0);
-      setSessions(sessionData);
-      calculateStats(sessionData);
+      const response = await analysisService.getSessions();
+      console.log('Fetched sessions:', response);
+      
+      // Use safe array access and validate sessions
+      const safeSessions = safeArray(response).filter(validateSession);
+      console.log('Validated sessions:', safeSessions.length, 'out of', safeArray(response).length);
+      
+      setSessions(safeSessions);
+      calculateStats(safeSessions);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to load dashboard data');
     } finally {
       setIsLoading(false);
     }
   };
-
   const calculateStats = (sessionData: AnalysisSession[]) => {
     const today = new Date().toDateString();
     const todaySessions = sessionData.filter(s => new Date(s.createdAt).toDateString() === today);
@@ -409,8 +414,15 @@ const DatabaseDashboard: React.FC<DatabaseDashboardProps> = ({ onSelectSession }
                   </span>
                 </div>
                 
-                {sessions.map((session) => (
-                  <div
+                {sessions.map((session) => {
+                  // Production safety: Guard against undefined session
+                  if (!session || !session.id) {
+                    console.warn('🛡️ Skipping invalid session:', session);
+                    return null;
+                  }
+                  
+                  return (
+                    <div
                     key={session.id}
                     onClick={() => onSelectSession?.(session)}
                     className="p-6 bg-black/30 backdrop-blur-sm border border-white/20 rounded-2xl hover:bg-white/10 hover:border-primary/30 transition-all duration-300 cursor-pointer group shadow-lg hover:shadow-xl"
@@ -950,7 +962,8 @@ Agent: {(() => {
                       </div>
                     )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             ))
           )}

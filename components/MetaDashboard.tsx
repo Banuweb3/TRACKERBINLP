@@ -316,7 +316,7 @@ const MetaDashboard: React.FC = () => {
             UM
           </div>
           <div>
-            <div className="font-bold text-lg">Unified Meta</div>
+            <div className="font-bold text-lg">Meta</div>
             <div className="text-xs text-slate-400">Ads + Pages</div>
           </div>
         </div>
@@ -362,7 +362,7 @@ const MetaDashboard: React.FC = () => {
         <header className="sticky top-0 z-20 backdrop-blur-sm bg-white/70 border-b border-slate-200/50">
           <div className="flex items-center justify-between p-4">
             <div>
-              <h1 className="text-xl font-extrabold text-slate-800">Unified Meta Dashboard</h1>
+              <h1 className="text-xl font-extrabold text-slate-800"> Meta Dashboard</h1>
               <p className="text-sm text-slate-600">Ads & Pages — consolidated view</p>
             </div>
             <div className="flex items-center gap-3">

@@ -14,6 +14,7 @@ import AuthModal from './components/AuthModal';
 import UserMenu from './components/UserMenu';
 import DatabaseDashboard from './components/DatabaseDashboard';
 import MetaDashboard from './components/MetaDashboard';
+import CallingDashboardV2 from './components/CallingDashboardV2';
 import { Header, Footer } from './components/Layout';
 
 const App: React.FC = () => {
@@ -33,7 +34,7 @@ const App: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
   
   // Navigation state
-  const [viewMode, setViewMode] = useState<'single' | 'audio' | 'bulk' | 'meta'>('single');
+  const [viewMode, setViewMode] = useState<'single' | 'audio' | 'bulk' | 'meta' | 'calling'>('single');
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [bulkResults, setBulkResults] = useState<EnhancedAnalysisResult[]>([]);
   const [bulkProgress, setBulkProgress] = useState<BulkAnalysisProgress[]>([]);
@@ -319,6 +320,19 @@ const App: React.FC = () => {
                 >
                   Meta Dashboard
                 </button>
+                <button
+                  onClick={() => {
+                    setViewMode('calling');
+                    setShowHistory(false);
+                  }}
+                  className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    viewMode === 'calling' && !showHistory
+                      ? 'bg-primary text-text-light' 
+                      : 'text-text-light/80 hover:text-text-light'
+                  }`}
+                >
+                  Calling Dashboard
+                </button>
               </div>
               <button
                 onClick={() => setShowHistory(!showHistory)}
@@ -390,6 +404,10 @@ const App: React.FC = () => {
           ) : viewMode === 'meta' ? (
             <div className="lg:col-span-12">
               <MetaDashboard />
+            </div>
+          ) : viewMode === 'calling' ? (
+            <div className="lg:col-span-12">
+              <CallingDashboardV2 />
             </div>
           ) : (
             <>

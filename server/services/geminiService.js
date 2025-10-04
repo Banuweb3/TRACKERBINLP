@@ -53,19 +53,28 @@ if (UNIQUE_API_KEYS.length === 0) {
 async function executeWithRetry(generateContentCall) {
   let lastError = null;
 
+  console.log(`🔑 Starting API call with ${UNIQUE_API_KEYS.length} available keys`);
+
   for (let i = 0; i < UNIQUE_API_KEYS.length; i++) {
     const apiKey = UNIQUE_API_KEYS[i];
     try {
+      console.log(`🔑 Trying API key #${i + 1}: ${apiKey.substring(0, 20)}...`);
       const ai = new GoogleGenerativeAI(apiKey);
       const result = await generateContentCall(ai);
+      console.log(`✅ API key #${i + 1} succeeded`);
       return result;
     } catch (error) {
-      console.warn(`API call with key #${i + 1} failed. Retrying with the next key...`);
+      console.warn(`❌ API call with key #${i + 1} failed:`, error.message);
+      console.warn(`Error details:`, {
+        status: error.status,
+        statusText: error.statusText,
+        message: error.message
+      });
       lastError = error;
     }
   }
 
-  console.error("All API keys failed.", lastError);
+  console.error("🚨 All API keys failed. Last error:", lastError);
   throw lastError || new Error("All API keys have failed; please check your keys and quota.");
 }
 
@@ -117,7 +126,7 @@ export async function transcribeAudio(audioBuffer, mimeType, sourceLanguage) {
 
     const response = await executeWithRetry(async (ai) => {
       const model = ai.getGenerativeModel({ 
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         generationConfig: {
           temperature: 0.2,
           maxOutputTokens: 8192
@@ -178,7 +187,7 @@ Output in English:`;
   try {
     const response = await executeWithRetry(async (ai) => {
       const model = ai.getGenerativeModel({ 
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         generationConfig: {
           temperature: 0.1, // Very low temperature for consistent translation
           maxOutputTokens: 8192,
@@ -221,7 +230,7 @@ Output in English:`;
       try {
         const retryResponse = await executeWithRetry(async (ai) => {
           const model = ai.getGenerativeModel({ 
-            model: 'gemini-1.5-flash',
+            model: 'gemini-2.5-flash',
             generationConfig: {
               temperature: 0.0,
               maxOutputTokens: 8192
@@ -294,7 +303,7 @@ Text: "${text}"`;
   try {
     const response = await executeWithRetry(async (ai) => {
       const model = ai.getGenerativeModel({ 
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         generationConfig: {
           responseMimeType: 'application/json',
           responseSchema: {
@@ -423,7 +432,7 @@ export async function extractKeywords(text) {
   try {
     const response = await executeWithRetry(async (ai) => {
       const model = ai.getGenerativeModel({ 
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         generationConfig: {
           responseMimeType: 'application/json',
           responseSchema: {

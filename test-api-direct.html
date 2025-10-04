@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct API Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="p-6 max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Direct API Test</h1>
+        
+        <div class="space-y-4">
+            <button id="testBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
+                🧪 Test API Direct Call
+            </button>
+            
+            <div id="status" class="p-4 rounded-lg bg-gray-100">
+                <p class="text-gray-600">Click the button to test the API</p>
+            </div>
+            
+            <div id="result" class="hidden"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('testBtn').addEventListener('click', async () => {
+            const statusDiv = document.getElementById('status');
+            const resultDiv = document.getElementById('result');
+            const btn = document.getElementById('testBtn');
+            
+            btn.disabled = true;
+            btn.textContent = '🔄 Testing...';
+            statusDiv.innerHTML = '<p class="text-blue-600">🔄 Making API call...</p>';
+            resultDiv.classList.add('hidden');
+            
+            try {
+                console.log('🚀 Starting API test...');
+                
+                const cacheBuster = new Date().getTime();
+                const url = `https://commodiously-appositional-yung.ngrok-free.dev/api.php/?t=${cacheBuster}`;
+                
+                console.log('📡 Calling:', url);
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': 'true'
+                    },
+                    cache: 'no-cache'
+                });
+
+                console.log('📊 Response status:', response.status);
+                console.log('📊 Response ok:', response.ok);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ API Success:', data);
+                    
+                    // Calculate some basic stats
+                    const totalCalls = Array.isArray(data) ? data.length : 0;
+                    const incomingCalls = Array.isArray(data) ? data.filter(call => call.call_type === 'INCOMING').length : 0;
+                    const missedCalls = Array.isArray(data) ? data.filter(call => call.dialer_status === 'MISSED').length : 0;
+                    const agents = Array.isArray(data) ? [...new Set(data.map(call => call.agent_id))].length : 0;
+                    
+                    statusDiv.innerHTML = `
+                        <div class="bg-green-50 border border-green-200 rounded p-4">
+                            <p class="text-green-800 font-bold">✅ API Working Successfully!</p>
+                            <div class="mt-2 space-y-1 text-sm">
+                                <p><strong>Total Records:</strong> ${totalCalls}</p>
+                                <p><strong>Incoming Calls:</strong> ${incomingCalls}</p>
+                                <p><strong>Missed Calls:</strong> ${missedCalls}</p>
+                                <p><strong>Unique Agents:</strong> ${agents}</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    resultDiv.innerHTML = `
+                        <div class="bg-white border rounded-lg p-4">
+                            <h3 class="font-bold mb-2">Sample Data (First Record):</h3>
+                            <pre class="text-xs bg-gray-50 p-3 rounded overflow-auto">${JSON.stringify(data[0] || {}, null, 2)}</pre>
+                        </div>
+                    `;
+                    resultDiv.classList.remove('hidden');
+                    
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+            } catch (error) {
+                console.error('❌ API Error:', error);
+                
+                statusDiv.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded p-4">
+                        <p class="text-red-800 font-bold">❌ API Error</p>
+                        <p class="text-red-700 text-sm mt-1">${error.message}</p>
+                        <p class="text-red-600 text-xs mt-2">Check browser console for details</p>
+                    </div>
+                `;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🧪 Test API Direct Call';
+            }
+        });
+    </script>
+</body>
+</html>

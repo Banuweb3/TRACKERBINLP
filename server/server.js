@@ -9,6 +9,7 @@ import authRoutes from './routes/auth.js';
 import analysisRoutes from './routes/analysis.js';
 import bulkAnalysisRoutes from './routes/bulkAnalysis.js';
 import metaRoutes from './routes/meta.js';
+import callingRoutes from './routes/calling.js';
 
 // Load environment variables
 dotenv.config();
@@ -58,6 +59,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/analysis', analysisRoutes);
 app.use('/api/bulk-analysis', bulkAnalysisRoutes);
 app.use('/api/meta', metaRoutes);
+app.use('/api/calling', callingRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

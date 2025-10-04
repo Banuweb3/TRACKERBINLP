@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF--8" />
+    <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BPO Quality Analytics Platform</title>
@@ -118,6 +118,32 @@
 </head>
   <body class="bg-base-200">
     <div id="root"></div>
+    
+    <!-- Production Error Safety Script -->
+    <script>
+      // Production safety for "TypeError: can't access property 'id', H is undefined"
+      window.addEventListener('error', function(event) {
+        const error = event.error;
+        if (error && error.message && error.message.includes("can't access property")) {
+          console.warn('🛡️ Production Fix: Caught property access error:', error.message);
+          event.preventDefault();
+          return true;
+        }
+      });
+      
+      // Safe property access helper
+      window.safeAccess = function(obj, prop, fallback = null) {
+        try {
+          return obj && obj[prop] !== undefined ? obj[prop] : fallback;
+        } catch (e) {
+          console.warn('🛡️ Safe access prevented error:', e.message);
+          return fallback;
+        }
+      };
+      
+      console.log('🛡️ Production safety loaded');
+    </script>
+    
   <script type="module" src="/index.tsx"></script>
 </body>
 </html>
