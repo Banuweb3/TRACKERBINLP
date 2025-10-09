@@ -126,8 +126,13 @@ app.post('/api/auth/register', async (req, res) => {
     );
 
     console.log('✅ User created in database:', email);
+    
+    // Generate a simple token (in production, use JWT)
+    const token = `token_${result.insertId}_${Date.now()}`;
+    
     const response = {
       message: 'User registered successfully',
+      token: token,
       user: {
         id: result.insertId,
         username,
@@ -208,8 +213,13 @@ app.post('/api/auth/login', async (req, res) => {
     }
 
     console.log('✅ Login successful for:', email);
+    
+    // Generate a simple token (in production, use JWT)
+    const token = `token_${user.id}_${Date.now()}`;
+    
     const response = {
       message: 'Login successful',
+      token: token,
       user: {
         id: user.id,
         username: user.username,
