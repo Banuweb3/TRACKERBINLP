@@ -167,13 +167,27 @@ app.post('/api/auth/login', async (req, res) => {
   }
 
   try {
+    // Test database connection first
+    console.log('🔍 Testing database connection...');
+    await pool.execute('SELECT 1');
+    console.log('✅ Database connection OK');
+
     // Find user by email
+    console.log('🔍 Looking for user with email:', email);
     const [users] = await pool.execute(
       'SELECT id, username, email, password_hash, first_name, last_name FROM users WHERE email = ? AND is_active = TRUE',
       [email]
     );
 
+    console.log('📊 Found users:', users.length);
+    if (users.length > 0) {
+      console.log('👤 User found:', { id: users[0].id, email: users[0].email });
+      console.log('🔑 Stored password hash:', users[0].password_hash);
+      console.log('🔑 Provided password:', password);
+    }
+
     if (users.length === 0) {
+      console.log('❌ No user found with email:', email);
       return res.status(401).json({
         error: 'Invalid credentials',
         message: 'Email or password is incorrect'
@@ -184,6 +198,9 @@ app.post('/api/auth/login', async (req, res) => {
     
     // Simple password check (in production, use bcrypt)
     if (user.password_hash !== password) {
+      console.log('❌ Password mismatch!');
+      console.log('   Stored:', user.password_hash);
+      console.log('   Provided:', password);
       return res.status(401).json({
         error: 'Invalid credentials',
         message: 'Email or password is incorrect'
@@ -223,6 +240,37 @@ app.post('/api/auth/logout', (req, res) => {
     message: 'Logout successful', 
     success: true 
   });
+});
+
+// Debug endpoint to check users in database
+app.get('/api/debug/users', async (req, res) => {
+  console.log('🔍 Debug: Checking users in database');
+  res.setHeader('Content-Type', 'application/json');
+  
+  try {
+    const [users] = await pool.execute(
+      'SELECT id, username, email, password_hash, created_at FROM users ORDER BY created_at DESC LIMIT 10'
+    );
+    
+    console.log('📊 Total users found:', users.length);
+    res.json({
+      success: true,
+      totalUsers: users.length,
+      users: users.map(user => ({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        passwordLength: user.password_hash ? user.password_hash.length : 0,
+        created: user.created_at
+      }))
+    });
+  } catch (error) {
+    console.error('❌ Debug users error:', error);
+    res.status(500).json({
+      error: 'Database error',
+      message: error.message
+    });
+  }
 });
 
 // Profile endpoint
