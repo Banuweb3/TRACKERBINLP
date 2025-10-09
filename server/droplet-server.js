@@ -371,10 +371,15 @@ app.get('/api/meta/dashboard', (req, res) => {
   });
 });
 
-// Helper function to validate token
+// Helper function to validate token with debugging
 function validateToken(req, res, next) {
+  console.log('🔍 Token validation requested for:', req.path);
+  
   const authHeader = req.headers.authorization;
+  console.log('🔑 Auth header:', authHeader ? 'Present' : 'Missing');
+  
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    console.log('❌ No valid auth header');
     return res.status(401).json({
       error: 'Authentication required',
       message: 'No token provided'
@@ -382,31 +387,46 @@ function validateToken(req, res, next) {
   }
   
   const token = authHeader.substring(7);
+  console.log('🔑 Token received:', token);
   
   // Simple token validation (token_userId_timestamp format)
   if (token.startsWith('token_') && token.includes('_')) {
     const parts = token.split('_');
     if (parts.length === 3 && !isNaN(parts[1]) && !isNaN(parts[2])) {
       req.userId = parseInt(parts[1]);
+      console.log('✅ Token valid for user:', req.userId);
       return next();
     }
   }
   
+  console.log('❌ Token invalid:', token);
   return res.status(401).json({
     error: 'Invalid token',
     message: 'Token is invalid or expired'
   });
 }
 
-// Analysis create session endpoint (with auth)
+// Analysis create session endpoint (with auth and debugging)
 app.post('/api/analysis/sessions', validateToken, (req, res) => {
   console.log('📝 Create analysis session for user:', req.userId);
+  console.log('📝 Request body:', req.body);
   res.setHeader('Content-Type', 'application/json');
   res.json({
     success: true,
     sessionId: Date.now(),
     userId: req.userId,
     message: 'Session created successfully'
+  });
+});
+
+// Analysis sessions GET endpoint (list sessions)
+app.get('/api/analysis/sessions', validateToken, (req, res) => {
+  console.log('📊 Get analysis sessions for user:', req.userId);
+  res.setHeader('Content-Type', 'application/json');
+  res.json({
+    success: true,
+    sessions: [],
+    message: 'No sessions found'
   });
 });
 
