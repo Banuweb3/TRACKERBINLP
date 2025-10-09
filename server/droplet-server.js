@@ -251,6 +251,43 @@ app.get('/api/analysis/sessions', (req, res) => {
   });
 });
 
+// Check existing analysis endpoint
+app.get('/api/analysis/sessions/check', (req, res) => {
+  console.log('🔍 Check analysis request:', req.query);
+  res.setHeader('Content-Type', 'application/json');
+  res.json({
+    exists: false,
+    message: 'No existing analysis found'
+  });
+});
+
+// Meta dashboard endpoint
+app.get('/api/meta/dashboard', (req, res) => {
+  console.log('📈 Meta dashboard request:', req.query);
+  res.setHeader('Content-Type', 'application/json');
+  res.json({
+    success: true,
+    data: {
+      impressions: 0,
+      clicks: 0,
+      spend: 0,
+      ctr: 0
+    },
+    message: 'Demo data'
+  });
+});
+
+// Analysis create session endpoint
+app.post('/api/analysis/sessions', (req, res) => {
+  console.log('📝 Create analysis session:', req.body);
+  res.setHeader('Content-Type', 'application/json');
+  res.json({
+    success: true,
+    sessionId: Date.now(),
+    message: 'Session created successfully'
+  });
+});
+
 // Catch all API routes
 app.use('/api/*', (req, res) => {
   console.log('🔍 API route not found:', req.path);
