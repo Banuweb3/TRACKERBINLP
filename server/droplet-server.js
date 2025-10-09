@@ -288,6 +288,111 @@ app.post('/api/analysis/sessions', (req, res) => {
   });
 });
 
+// File upload endpoint for analysis
+app.post('/api/analysis/upload', (req, res) => {
+  console.log('📁 File upload request received');
+  res.setHeader('Content-Type', 'application/json');
+  res.json({
+    success: true,
+    fileId: Date.now(),
+    message: 'File uploaded successfully'
+  });
+});
+
+// Analysis processing endpoint
+app.post('/api/analysis/process', (req, res) => {
+  console.log('⚙️ Analysis processing request:', req.body);
+  res.setHeader('Content-Type', 'application/json');
+  res.json({
+    success: true,
+    results: {
+      sentiment: 'positive',
+      confidence: 0.85,
+      keywords: ['customer', 'service', 'quality'],
+      summary: 'Customer expressed satisfaction with service quality'
+    },
+    message: 'Analysis completed successfully'
+  });
+});
+
+// Calling dashboard data endpoint
+app.get('/api/calling/dashboard-data', (req, res) => {
+  console.log('📞 Calling dashboard data request');
+  res.setHeader('Content-Type', 'application/json');
+  res.json({
+    success: true,
+    data: {
+      totalCalls: 150,
+      successfulCalls: 142,
+      failedCalls: 8,
+      averageDuration: 245,
+      callsToday: 25,
+      callsThisWeek: 180,
+      callsThisMonth: 720
+    },
+    message: 'Dashboard data retrieved successfully'
+  });
+});
+
+// Analysis transcribe endpoint
+app.post('/api/analysis/transcribe', (req, res) => {
+  console.log('🎤 Transcribe request received');
+  res.setHeader('Content-Type', 'application/json');
+  res.json({
+    success: true,
+    transcript: 'Hello, this is a sample transcription of the audio file.',
+    confidence: 0.92,
+    language: 'en',
+    message: 'Transcription completed successfully'
+  });
+});
+
+// Analysis translate endpoint
+app.post('/api/analysis/translate', (req, res) => {
+  console.log('🌐 Translate request received:', req.body);
+  res.setHeader('Content-Type', 'application/json');
+  res.json({
+    success: true,
+    translatedText: 'This is the translated text.',
+    sourceLanguage: req.body.sourceLanguage || 'auto',
+    targetLanguage: req.body.targetLanguage || 'en',
+    message: 'Translation completed successfully'
+  });
+});
+
+// Analysis keywords endpoint
+app.post('/api/analysis/keywords', (req, res) => {
+  console.log('🔑 Keywords extraction request');
+  res.setHeader('Content-Type', 'application/json');
+  res.json({
+    success: true,
+    keywords: [
+      { word: 'customer', relevance: 0.95 },
+      { word: 'service', relevance: 0.88 },
+      { word: 'quality', relevance: 0.82 },
+      { word: 'support', relevance: 0.75 }
+    ],
+    message: 'Keywords extracted successfully'
+  });
+});
+
+// Analysis complete endpoint
+app.post('/api/analysis/complete', (req, res) => {
+  console.log('✅ Complete analysis request');
+  res.setHeader('Content-Type', 'application/json');
+  res.json({
+    success: true,
+    analysisId: Date.now(),
+    results: {
+      overall_sentiment: 'positive',
+      confidence_score: 0.87,
+      key_topics: ['customer satisfaction', 'service quality'],
+      recommendations: ['Continue current approach', 'Focus on efficiency']
+    },
+    message: 'Complete analysis finished successfully'
+  });
+});
+
 // Catch all API routes
 app.use('/api/*', (req, res) => {
   console.log('🔍 API route not found:', req.path);
