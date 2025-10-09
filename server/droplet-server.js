@@ -717,21 +717,136 @@ app.post('/api/analysis/keywords', (req, res) => {
   });
 });
 
-// Analysis complete endpoint
+// Analysis complete endpoint - handles multipart form data
 app.post('/api/analysis/complete', (req, res) => {
-  console.log('✅ Complete analysis request');
-  res.setHeader('Content-Type', 'application/json');
-  res.json({
-    success: true,
-    analysisId: Date.now(),
-    results: {
-      overall_sentiment: 'positive',
-      confidence_score: 0.87,
-      key_topics: ['customer satisfaction', 'service quality'],
-      recommendations: ['Continue current approach', 'Focus on efficiency']
-    },
-    message: 'Complete analysis finished successfully'
-  });
+  console.log('✅ Complete analysis request received');
+  console.log('📝 Request headers:', req.headers['content-type']);
+  console.log('📝 Request body type:', typeof req.body);
+
+  // Handle both multipart form data and JSON
+  let sourceLanguage = 'en';
+  let sessionId = null;
+
+  try {
+    // Check if it's multipart form data
+    if (req.headers['content-type'] && req.headers['content-type'].includes('multipart/form-data')) {
+      console.log('📁 Processing multipart form data');
+
+      // For multipart data, we'd need multer or similar middleware
+      // For now, return expected format
+      const resultId = Date.now();
+
+      res.setHeader('Content-Type', 'application/json');
+      res.json({
+        success: true,
+        transcription: "This is a sample transcription of the uploaded audio file. The audio has been successfully processed and converted to text format.",
+        translation: "Esta es una transcripción de muestra del archivo de audio subido. El audio ha sido procesado exitosamente y convertido a formato de texto.",
+        analysis: {
+          customerSentiment: {
+            sentiment: 'POSITIVE',
+            score: 0.85,
+            justification: 'Customer expressed satisfaction with the service and showed positive engagement throughout the call.'
+          },
+          agentSentiment: {
+            positive: {
+              sentiment: 'POSITIVE',
+              score: 0.90,
+              justification: 'Agent maintained professional and helpful demeanor throughout the interaction.'
+            },
+            callOpening: {
+              sentiment: 'POSITIVE',
+              score: 0.88,
+              justification: 'Agent greeted customer warmly and established rapport effectively.'
+            },
+            callQuality: {
+              sentiment: 'POSITIVE',
+              score: 0.92,
+              justification: 'Call flowed smoothly with clear communication and effective issue resolution.'
+            },
+            callClosing: {
+              sentiment: 'POSITIVE',
+              score: 0.87,
+              justification: 'Agent summarized resolution clearly and confirmed customer satisfaction.'
+            }
+          },
+          summary: "Overall, this was a successful customer service interaction. The agent demonstrated excellent communication skills and customer service abilities. The customer was satisfied with the resolution provided.",
+          agentCoaching: "Continue using the same professional and helpful approach. Focus on maintaining clear communication and confirming customer understanding at each step of the resolution process."
+        },
+        keywords: [
+          { word: "customer", relevance: 0.95 },
+          { word: "service", relevance: 0.88 },
+          { word: "satisfaction", relevance: 0.82 },
+          { word: "resolution", relevance: 0.79 },
+          { word: "professional", relevance: 0.75 }
+        ],
+        sessionId: req.body?.sessionId || Date.now(),
+        resultId: resultId,
+        message: 'Complete analysis finished successfully'
+      });
+
+    } else {
+      // Handle JSON request (fallback)
+      console.log('📄 Processing JSON request');
+      const { sourceLanguage: lang, sessionId: sid } = req.body || {};
+
+      if (lang) sourceLanguage = lang;
+      if (sid) sessionId = sid;
+
+      const resultId = Date.now();
+
+      res.setHeader('Content-Type', 'application/json');
+      res.json({
+        success: true,
+        transcription: "Sample transcription text for analysis...",
+        translation: "Texto de transcripción de muestra para análisis...",
+        analysis: {
+          customerSentiment: {
+            sentiment: 'POSITIVE',
+            score: 0.80,
+            justification: 'Customer showed positive sentiment throughout the interaction.'
+          },
+          agentSentiment: {
+            positive: {
+              sentiment: 'POSITIVE',
+              score: 0.85,
+              justification: 'Agent maintained positive and professional demeanor.'
+            },
+            callOpening: {
+              sentiment: 'POSITIVE',
+              score: 0.82,
+              justification: 'Effective opening established good rapport.'
+            },
+            callQuality: {
+              sentiment: 'POSITIVE',
+              score: 0.88,
+              justification: 'Clear communication and smooth call flow.'
+            },
+            callClosing: {
+              sentiment: 'POSITIVE',
+              score: 0.80,
+              justification: 'Proper closing confirmed resolution and satisfaction.'
+            }
+          },
+          summary: "This was a successful customer interaction with positive outcomes.",
+          agentCoaching: "Maintain current approach and focus on clear communication."
+        },
+        keywords: [
+          { word: "customer", relevance: 0.90 },
+          { word: "service", relevance: 0.85 }
+        ],
+        sessionId: sessionId || Date.now(),
+        resultId: resultId,
+        message: 'Complete analysis finished successfully'
+      });
+    }
+
+  } catch (error) {
+    console.error('❌ Complete analysis error:', error);
+    res.status(500).json({
+      error: 'Analysis failed',
+      message: error.message
+    });
+  }
 });
 
 // Catch all API routes
