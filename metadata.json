@@ -1,0 +1,7 @@
+{
+  "name": "Trackerbi",
+  "description": "A platform for BPO quality analytics, featuring multi-lingual audio transcription, translation, sentiment analysis, and keyword detection powered by Gemini.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

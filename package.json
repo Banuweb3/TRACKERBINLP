@@ -1,0 +1,40 @@
+{
+  "name": "bpo-analytics-platform",
+  "version": "1.0.1",
+  "description": "BPO Call Analytics Platform - Frontend",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "npx serve -s dist -l 8080 --single --cors"
+  },
+  "keywords": [
+    "bpo",
+    "analytics",
+    "frontend",
+    "react",
+    "vite"
+  ],
+  "author": "Banuweb3",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "lucide-react": "^0.263.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.7.2",
+    "serve": "^14.2.0"
+  },
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^5.0.4",
+    "typescript": "^5.9.3",
+    "vite": "^5.0.0"
+  }
+}

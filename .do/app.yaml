@@ -1,0 +1,57 @@
+name: bpo-analytics-platform
+services:
+- name: backend
+  source_dir: /server
+  github:
+    repo: Banuweb3/TRACKERBINLP
+    branch: main
+  build_command: npm install
+  run_command: npm start
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 3001
+  envs:
+  - key: NODE_ENV
+    value: production
+  - key: PORT
+    value: "3001"
+  - key: DB_HOST
+    value: trackerbi-do-user-17425890-0.m.db.ondigitalocean.com
+  - key: DB_PORT
+    value: "25060"
+  - key: DB_USER
+    value: doadmin
+  - key: DB_PASSWORD
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+  - key: DB_NAME
+    value: defaultdb
+  - key: FRONTEND_URL
+    value: https://trackerbi-vvrvr.ondigitalocean.app
+  routes:
+  # API routes MUST be first to catch /api requests
+  - path: /api
+    preserve_path_prefix: true
+  - path: /health
+    preserve_path_prefix: false
+
+- name: frontend
+  source_dir: /
+  github:
+    repo: Banuweb3/TRACKERBINLP
+    branch: main
+  build_command: npm install --legacy-peer-deps && npm run build
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 4173
+  envs:
+  - key: NODE_ENV
+    value: production
+  routes:
+  # Frontend handles everything else AFTER backend routes
+  - path: /assets
+    preserve_path_prefix: true
+  - path: /
+    preserve_path_prefix: false

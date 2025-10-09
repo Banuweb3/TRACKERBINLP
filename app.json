@@ -1,0 +1,134 @@
+{
+  "name": "bpo-analytics-platform",
+  "description": "BPO Call Analytics Platform with React Frontend and Node.js Backend",
+  "repository": "https://github.com/Banuweb3/TRACKERBINLP",
+  "keywords": ["nodejs", "express", "react", "vite", "api", "bpo", "analytics"],
+  "services": [
+    {
+      "name": "frontend",
+      "github": {
+        "repo": "Banuweb3/TRACKERBINLP",
+        "branch": "main"
+      },
+      "build_command": "npm install && npm run build",
+      "environment_slug": "node-js",
+      "source_dir": "/",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "http_port": 4173,
+      "instance_count": 1,
+      "instance_size_slug": "basic-xxs",
+      "health_check": {
+        "http_path": "/",
+        "initial_delay_seconds": 30,
+        "period_seconds": 10,
+        "timeout_seconds": 5,
+        "success_threshold": 1,
+        "failure_threshold": 3
+      },
+      "routes": [
+        {
+          "path": "/",
+          "preserve_path_prefix": false
+        }
+      ]
+    },
+    {
+      "name": "backend",
+      "github": {
+        "repo": "Banuweb3/TRACKERBINLP",
+        "branch": "main"
+      },
+      "build_command": "cd server && npm install",
+      "start_command": "cd server && npm start",
+      "environment_slug": "node-js",
+      "source_dir": "/server",
+      "env": {
+        "NODE_ENV": "production",
+        "PORT": "3001"
+      },
+      "http_port": 3001,
+      "instance_count": 1,
+      "instance_size_slug": "basic-xxs",
+      "health_check": {
+        "http_path": "/health",
+        "initial_delay_seconds": 30,
+        "period_seconds": 10,
+        "timeout_seconds": 5,
+        "success_threshold": 1,
+        "failure_threshold": 3
+      },
+      "routes": [
+        {
+          "path": "/api",
+          "preserve_path_prefix": true
+        }
+      ]
+    }
+  ],
+  "envs": [
+    {
+      "name": "Production Environment Variables",
+      "values": [
+        {
+          "key": "DB_HOST",
+          "description": "DigitalOcean Managed Database Host",
+          "value": "trackerbi-do-user-17425890-0.m.db.ondigitalocean.com",
+          "type": "SECRET"
+        },
+        {
+          "key": "DB_PORT",
+          "description": "DigitalOcean Managed Database Port",
+          "value": "25060",
+          "type": "GENERAL"
+        },
+        {
+          "key": "DB_USER",
+          "description": "DigitalOcean Managed Database Username",
+          "value": "doadmin",
+          "type": "SECRET"
+        },
+        {
+          "key": "DB_PASSWORD",
+          "description": "DigitalOcean Managed Database Password",
+          "value": "YOUR_DATABASE_PASSWORD_HERE",
+          "type": "SECRET"
+        },
+        {
+          "key": "DB_NAME",
+          "description": "DigitalOcean Managed Database Name",
+          "value": "defaultdb",
+          "type": "GENERAL"
+        },
+        {
+          "key": "JWT_SECRET",
+          "description": "JWT Secret for Authentication",
+          "value": "YOUR_SECURE_JWT_SECRET_HERE",
+          "type": "SECRET"
+        },
+        {
+          "key": "API_KEY",
+          "description": "Gemini API Key",
+          "value": "YOUR_GEMINI_API_KEY_HERE",
+          "type": "SECRET"
+        },
+        {
+          "key": "FRONTEND_URL",
+          "description": "Frontend URL for CORS",
+          "value": "https://your-app-name.ondigitalocean.app",
+          "type": "GENERAL"
+        }
+      ]
+    }
+  ],
+  "databases": [
+    {
+      "name": "bpo-analytics-db",
+      "engine": "MYSQL",
+      "version": "8",
+      "production": true,
+      "cluster_name": "bpo-analytics-cluster"
+    }
+  ]
+}

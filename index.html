@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trackerbi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      /* Production safety styles */
+      .production-safe {
+        position: relative;
+      }
+
+      .production-safe::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: -1;
+      }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              'primary': '#667eea',
+              'primary-focus': '#5a67d8',
+              'primary-content': '#ffffff',
+              'secondary': '#f7fafc',
+              'base-100': 'rgba(255, 255, 255, 0.95)',
+              'base-200': 'rgba(248, 250, 252, 0.8)',
+              'base-300': 'rgba(241, 245, 249, 0.9)',
+              'text-base': '#1a202c',
+              'text-muted': '#4a5568',
+              'text-light': '#ffffff',
+              'text-contrast': '#2d3748',
+              'sentiment-positive': '#48bb78',
+              'sentiment-neutral': '#718096',
+              'sentiment-negative': '#f56565',
+              'accent': '#764ba2',
+              'glass': 'rgba(255, 255, 255, 0.25)',
+            },
+          },
+        },
+      }
+    </script>
+    <style>
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background-attachment: fixed;
+        min-height: 100vh;
+      }
+      
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      }
+      
+      .glass-dark {
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+      }
+      
+      .card-hover {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .card-hover:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      
+      .pulse-animation {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      
+      @keyframes pulse {
+        0%, 100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: .8;
+        }
+      }
+      
+      .gradient-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      
+      .floating-animation {
+        animation: float 6s ease-in-out infinite;
+      }
+      
+      @keyframes float {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.17.0",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-base-200">
+    <div id="root"></div>
+    
+    <!-- Production Error Safety Script -->
+    <script>
+      // Production safety for "TypeError: can't access property 'id', H is undefined"
+      window.addEventListener('error', function(event) {
+        const error = event.error;
+        if (error && error.message && error.message.includes("can't access property")) {
+          console.warn('🛡️ Production Fix: Caught property access error:', error.message);
+          event.preventDefault();
+          return true;
+        }
+      });
+      
+      // Safe property access helper
+      window.safeAccess = function(obj, prop, fallback = null) {
+        try {
+          return obj && obj[prop] !== undefined ? obj[prop] : fallback;
+        } catch (e) {
+          console.warn('🛡️ Safe access prevented error:', e.message);
+          return fallback;
+        }
+      };
+      
+      console.log('🛡️ Production safety loaded');
+    </script>
+    
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

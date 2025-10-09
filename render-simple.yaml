@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: bpo-analytics-platform-fixed
+    env: node
+    plan: free
+    buildCommand: npm install --legacy-peer-deps && npm run build && cd server && cp package-simple.json package.json && npm install
+    startCommand: node server/simple-server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_HOST
+        value: trackerbi-do-user-17425890-0.m.db.ondigitalocean.com
+      - key: DB_PORT
+        value: 25060
+      - key: DB_USER
+        value: doadmin
+      - key: DB_NAME
+        value: defaultdb
+      - key: DB_SSLMODE
+        value: REQUIRED
