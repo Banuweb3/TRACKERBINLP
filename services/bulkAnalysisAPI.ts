@@ -12,7 +12,7 @@ const getApiBaseUrl = (): string => {
 
     // For production
     if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-      return '/api';
+      return '/api/analysis';
     }
   }
 
