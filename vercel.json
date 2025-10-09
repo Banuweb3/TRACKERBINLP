@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "name": "bpo-analytics-frontend",
   "builds": [
     {
       "src": "package.json",
@@ -7,20 +8,12 @@
       "config": {
         "distDir": "dist"
       }
-    },
-    {
-      "src": "server/simple-server.js",
-      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/server/simple-server.js"
-    },
-    {
-      "src": "/health",
-      "dest": "/server/simple-server.js"
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
     },
     {
       "src": "/(.*)",

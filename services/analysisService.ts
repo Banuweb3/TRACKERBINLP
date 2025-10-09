@@ -134,7 +134,7 @@ export class AnalysisService {
       }
 
       const result = await response.json();
-      return result.session;
+      return result; // Backend sends session data directly, not wrapped in 'session' property
     } catch (error) {
       console.error('Create session error:', error);
 
