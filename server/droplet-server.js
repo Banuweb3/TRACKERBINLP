@@ -283,7 +283,43 @@ app.get('/api/debug/users', async (req, res) => {
   }
 });
 
-// Profile endpoint
+// Token verification endpoint
+app.get('/api/auth/verify', (req, res) => {
+  console.log('🔍 Token verification request');
+  res.setHeader('Content-Type', 'application/json');
+  
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({
+      error: 'No token provided',
+      valid: false
+    });
+  }
+  
+  const token = authHeader.substring(7);
+  console.log('🔑 Verifying token:', token);
+  
+  // Simple token validation (token_userId_timestamp format)
+  if (token.startsWith('token_') && token.includes('_')) {
+    const parts = token.split('_');
+    if (parts.length === 3 && !isNaN(parts[1]) && !isNaN(parts[2])) {
+      console.log('✅ Token is valid');
+      return res.json({
+        valid: true,
+        userId: parseInt(parts[1]),
+        message: 'Token is valid'
+      });
+    }
+  }
+  
+  console.log('❌ Token is invalid');
+  res.status(401).json({
+    error: 'Invalid token',
+    valid: false
+  });
+});
+
+// Profile endpoint with token validation
 app.get('/api/auth/profile', (req, res) => {
   console.log('👤 Profile request received');
   res.setHeader('Content-Type', 'application/json');
@@ -335,13 +371,41 @@ app.get('/api/meta/dashboard', (req, res) => {
   });
 });
 
-// Analysis create session endpoint
-app.post('/api/analysis/sessions', (req, res) => {
-  console.log('📝 Create analysis session:', req.body);
+// Helper function to validate token
+function validateToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({
+      error: 'Authentication required',
+      message: 'No token provided'
+    });
+  }
+  
+  const token = authHeader.substring(7);
+  
+  // Simple token validation (token_userId_timestamp format)
+  if (token.startsWith('token_') && token.includes('_')) {
+    const parts = token.split('_');
+    if (parts.length === 3 && !isNaN(parts[1]) && !isNaN(parts[2])) {
+      req.userId = parseInt(parts[1]);
+      return next();
+    }
+  }
+  
+  return res.status(401).json({
+    error: 'Invalid token',
+    message: 'Token is invalid or expired'
+  });
+}
+
+// Analysis create session endpoint (with auth)
+app.post('/api/analysis/sessions', validateToken, (req, res) => {
+  console.log('📝 Create analysis session for user:', req.userId);
   res.setHeader('Content-Type', 'application/json');
   res.json({
     success: true,
     sessionId: Date.now(),
+    userId: req.userId,
     message: 'Session created successfully'
   });
 });
