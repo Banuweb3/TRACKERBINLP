@@ -10,9 +10,9 @@ const getApiBaseUrl = (): string => {
       return 'http://localhost:3001/api';
     }
 
-    // For production
+    // For production - use /api only, not /api/analysis
     if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-      return '/api/analysis';
+      return '/api';
     }
   }
 
