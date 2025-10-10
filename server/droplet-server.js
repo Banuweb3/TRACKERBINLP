@@ -723,23 +723,28 @@ app.post('/api/analysis/keywords', (req, res) => {
   });
 });
 
-// Analysis complete endpoint - handles multipart form data
-app.post('/api/analysis/complete', (req, res) => {
+// Analysis complete endpoint - handles multipart form data with multer
+app.post('/api/analysis/complete', upload.single('audio'), (req, res) => {
   console.log('✅ Complete analysis request received');
   console.log('📝 Request headers:', req.headers['content-type']);
   console.log('📝 Request body type:', typeof req.body);
+  console.log('📁 File info:', req.file ? { name: req.file.originalname, size: req.file.size } : 'No file');
 
   // Handle both multipart form data and JSON
   let sourceLanguage = 'en';
   let sessionId = null;
 
   try {
-    // Check if it's multipart form data
-    if (req.headers['content-type'] && req.headers['content-type'].includes('multipart/form-data')) {
-      console.log('📁 Processing multipart form data');
+    // Parse form fields from multipart data
+    if (req.body.sourceLanguage) sourceLanguage = req.body.sourceLanguage;
+    if (req.body.sessionId) sessionId = req.body.sessionId;
 
-      // For multipart data, we'd need multer or similar middleware
-      // For now, return expected format
+    console.log('📋 Parsed fields:', { sourceLanguage, sessionId });
+
+    // For multipart data with file, return expected format
+    if (req.file) {
+      console.log('📁 Processing multipart form data with audio file');
+
       const resultId = Date.now();
 
       res.setHeader('Content-Type', 'application/json');
@@ -785,7 +790,7 @@ app.post('/api/analysis/complete', (req, res) => {
           { word: "resolution", relevance: 0.79 },
           { word: "professional", relevance: 0.75 }
         ],
-        sessionId: req.body?.sessionId || Date.now(),
+        sessionId: sessionId || Date.now(),
         resultId: resultId,
         message: 'Complete analysis finished successfully'
       });
