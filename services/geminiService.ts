@@ -12,9 +12,9 @@ const getApiBaseUrl = (): string => {
       return 'http://localhost:3001/api/analysis';
     }
 
-    // For production - use /api/analysis (correct path)
+    // For production - use /api only, endpoints already include /analysis/
     if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-      return '/api/analysis';
+      return '/api';
     }
   }
 
