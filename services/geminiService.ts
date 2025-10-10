@@ -7,9 +7,9 @@ const getApiBaseUrl = (): string => {
     const hostname = window.location.hostname;
     const port = window.location.port;
 
-    // For local development
+    // For local development - use /api only, endpoints include /analysis/
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return 'http://localhost:3001/api/analysis';
+      return 'http://localhost:3001/api';
     }
 
     // For production - use /api only, endpoints already include /analysis/
@@ -19,7 +19,7 @@ const getApiBaseUrl = (): string => {
   }
 
   // Fallback for SSR or other environments
-  return ((import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:3001/api') + '/analysis';
+  return ((import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:3001/api');
 };
 
 const API_BASE_URL = getApiBaseUrl();
