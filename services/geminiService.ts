@@ -140,9 +140,9 @@ export async function performCompleteAnalysis(audioBlob: Blob, sourceLanguage: L
         formData.append('sourceLanguage', sourceLanguage);
         formData.append('sessionId', sessionId.toString());
 
-        console.log('📡 Making request to:', `${API_BASE_URL}/complete`);
+        console.log('📡 Making request to:', `${API_BASE_URL}/analysis/complete`);
         
-        const result = await makeAuthenticatedRequest(`${API_BASE_URL}/complete`, {
+        const result = await makeAuthenticatedRequest(`${API_BASE_URL}/analysis/complete`, {
             method: 'POST',
             body: formData,
         });
