@@ -12,7 +12,7 @@ const getApiBaseUrl = (): string => {
       return 'http://localhost:3001/api/analysis';
     }
 
-    // For production
+    // For production - use /api/analysis (correct path)
     if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
       return '/api/analysis';
     }
@@ -133,15 +133,21 @@ export async function extractKeywords(text: string): Promise<KeywordsResult> {
  */
 export async function performCompleteAnalysis(audioBlob: Blob, sourceLanguage: Language, sessionId: number) {
     try {
+        console.log('🔄 Starting complete analysis...', { sourceLanguage, sessionId });
+        
         const formData = new FormData();
         formData.append('audio', audioBlob);
         formData.append('sourceLanguage', sourceLanguage);
         formData.append('sessionId', sessionId.toString());
 
+        console.log('📡 Making request to:', `${API_BASE_URL}/complete`);
+        
         const result = await makeAuthenticatedRequest(`${API_BASE_URL}/complete`, {
             method: 'POST',
             body: formData,
         });
+
+        console.log('✅ Complete analysis result:', result);
 
         return {
             transcription: result.transcription,
@@ -152,7 +158,7 @@ export async function performCompleteAnalysis(audioBlob: Blob, sourceLanguage: L
             resultId: result.resultId,
         };
     } catch (error) {
-        console.error("Error during complete analysis:", error);
+        console.error("❌ Error during complete analysis:", error);
         throw new Error("Failed to perform complete analysis.");
     }
 }
